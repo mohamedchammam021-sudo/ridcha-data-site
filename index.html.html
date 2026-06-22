@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RIDCHA DATA - ESN Data Science & Engineering</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        :root {
+            --orange-primary: #FF6B35;
+            --orange-light: #F7931E;
+            --orange-gradient: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            --blue-primary: #1E3A8A;
+            --blue-secondary: #3B82F6;
+            --blue-gradient: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+            --gray-50: #F8FAFC;
+            --gray-200: #E2E8F0;
+            --gray-600: #475569;
+            --gray-800: #1E293B;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; color: var(--gray-800); line-height: 1.6; background: var(--gray-50); }
+
+        /* DARK MODE */
+        body.dark-mode { background: #0F172A; color: #F1F5F9; }
+        body.dark-mode header { background: rgba(15, 23, 42, 0.95); border-bottom-color: #334155; }
+        body.dark-mode .services, body.dark-mode .testimonials { background: #1E293B; }
+        body.dark-mode .service-card, body.dark-mode .testimonial-card, body.dark-mode .contact-form, body.dark-mode .bot-panel, body.dark-mode .score-card, body.dark-mode .info-card, body.dark-mode .detail-card, body.dark-mode .recommendation, body.dark-mode .poste-card-mini { background: #1E293B; border-color: #334155; }
+        body.dark-mode .service-card h3, body.dark-mode .testimonial-author h4, body.dark-mode .contact-info h3, body.dark-mode .form-group label, body.dark-mode .bot-panel-header h3, body.dark-mode .score-title, body.dark-mode .detail-card h3, body.dark-mode .info-card h4 { color: #F1F5F9; }
+        body.dark-mode .service-card p, body.dark-mode .testimonial-text, body.dark-mode .section-desc, body.dark-mode .contact-info > p, body.dark-mode .score-subtitle, body.dark-mode .detail-card li, body.dark-mode .recommendation p, body.dark-mode .poste-card-mini p { color: #94A3B8; }
+        body.dark-mode .section-title { color: #60A5FA; }
+        body.dark-mode .section-title span { color: #F7931E; }
+        body.dark-mode .btn-contact, body.dark-mode .btn-submit, body.dark-mode .calendly-btn { background: linear-gradient(135deg, #F7931E, #FF6B35); }
+        body.dark-mode .contact-form input, body.dark-mode .contact-form textarea, body.dark-mode .contact-form select { background: #0F172A; border-color: #334155; color: #F1F5F9; }
+        body.dark-mode .service-tag { background: rgba(59, 130, 246, 0.15); color: #60A5FA; }
+        body.dark-mode .poste-card-mini h4 { color: #60A5FA; }
+        body.dark-mode .file-name { color: #60A5FA; }
+        body.dark-mode .btn-analyze-mini { background: linear-gradient(135deg, #1E3A8A, #3B82F6); }
+        body.dark-mode .btn-analyze-mini.analyzing { background: linear-gradient(135deg, #F7931E, #FF6B35); }
+        body.dark-mode .btn-upload-mini { background: linear-gradient(135deg, #F7931E, #FF6B35); }
+        body.dark-mode .spinner-mini { border-color: #334155; border-top-color: #F7931E; }
+        body.dark-mode .skill-tag { background: rgba(247, 147, 30, 0.15); color: #F7931E; }
+        body.dark-mode .calendly-modal-content { background: #1E293B; }
+        body.dark-mode .expertise-item { background: rgba(255,255,255,0.05); border-color: #334155; }
+        body.dark-mode .expertise-item h4, body.dark-mode .expertise-item p { color: #F1F5F9; }
+        body.dark-mode .number-item p { color: #94A3B8; }
+        body.dark-mode .footer-column a { color: #94A3B8; }
+        body.dark-mode .footer-bottom { color: #64748B; }
+        body.dark-mode .footer-bottom p { color: #64748B; }
+        body.dark-mode .footer-container p { color: #94A3B8; }
+        body.dark-mode .logo-text { color: #60A5FA; }
+        body.dark-mode .logo-text span { color: #F7931E; }
+        body.dark-mode nav a { color: #94A3B8; }
+        body.dark-mode nav a:hover { color: #F7931E; }
+        body.dark-mode .contact-item h4 { color: #F1F5F9; }
+        body.dark-mode .contact-item p { color: #94A3B8; }
+        body.dark-mode .contact-form { background: #1E293B; border-color: #334155; }
+        body.dark-mode .calendly-modal-content { background: #1E293B; }
+        body.dark-mode .calendly-modal-close { background: #F7931E; }
+        body.dark-mode .calendly-modal-close:hover { background: #E55A2B; }
+        body.dark-mode .detail-card.positive { border-left-color: #3B82F6; }
+        body.dark-mode .detail-card.negative { border-left-color: #F7931E; }
+        body.dark-mode .recommendation.high { border-color: #3B82F6; background: rgba(59, 130, 246, 0.05); }
+        body.dark-mode .recommendation.medium { border-color: #F7931E; background: rgba(247, 147, 30, 0.05); }
+        body.dark-mode .recommendation.low { border-color: #E55A2B; background: rgba(229, 90, 43, 0.05); }
+        body.dark-mode .recommendation.high h3 { color: #3B82F6; }
+        body.dark-mode .recommendation.medium h3 { color: #F7931E; }
+        body.dark-mode .recommendation.low h3 { color: #E55A2B; }
+        body.dark-mode .score-circle.high { background: linear-gradient(135deg, #1E3A8A, #3B82F6); }
+        body.dark-mode .score-circle.medium { background: linear-gradient(135deg, #F7931E, #FF6B35); }
+        body.dark-mode .score-circle.low { background: linear-gradient(135deg, #E55A2B, #FF6B35); }
+        body.dark-mode .info-card h4 { color: #F7931E; }
+        body.dark-mode .detail-card li i { color: #F7931E; }
+
+        .dark-mode-toggle {
+            background: none; border: 2px solid var(--orange-primary); color: var(--orange-primary);
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+            font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s; margin-left: 1rem;
+        }
+        .dark-mode-toggle:hover { background: var(--orange-primary); color: white; }
+
+        /* HEADER */
+        header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--gray-200); transition: background 0.3s, border-color 0.3s; }
+        .header-container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; height: 80px; }
+        .logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+        .logo img { height: 55px; width: auto; }
+        nav ul { display: flex; list-style: none; gap: 2rem; }
+        nav a { text-decoration: none; color: var(--gray-600); font-weight: 500; transition: color 0.3s; }
+        nav a:hover { color: var(--orange-primary); }
+        .btn-contact { background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%); color: white; padding: 0.6rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; box-shadow: 0 4px 15px rgba(255,107,53,0.3); }
+
+        /* HERO */
+        .hero { min-height: 100vh; display: flex; align-items: center; background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 50%, #1e40af 100%); padding-top: 80px; color: white; }
+        .hero-container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+        .hero-content h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; }
+        .hero-content h1 span { background: linear-gradient(135deg, #FF6B35, #F7931E); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-content p { font-size: 1.2rem; color: rgba(255,255,255,0.85); margin-bottom: 2rem; }
+        .hero-buttons { display: flex; gap: 1rem; }
+        .btn-primary { background: linear-gradient(135deg, #FF6B35, #F7931E); color: white; padding: 1rem 2rem; border-radius: 10px; text-decoration: none; font-weight: 600; box-shadow: 0 4px 20px rgba(255,107,53,0.4); }
+        .btn-secondary { background: transparent; color: white; padding: 1rem 2rem; border-radius: 10px; text-decoration: none; font-weight: 600; border: 2px solid rgba(255,255,255,0.3); }
+        .hero-stats { display: flex; gap: 2.5rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.15); }
+        .stat-item h3 { font-size: 2rem; font-weight: 800; color: #F7931E; }
+        .stat-item p { font-size: 0.9rem; color: rgba(255,255,255,0.7); }
+
+        /* BOT PANEL */
+        .bot-panel { background: white; border-radius: 20px; padding: 2rem; color: var(--gray-800); box-shadow: 0 20px 60px rgba(0,0,0,0.3); transition: background 0.3s, color 0.3s; }
+        .bot-panel-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid var(--gray-200); }
+        .bot-panel-header i { font-size: 1.5rem; color: var(--orange-primary); }
+        .bot-panel-header h3 { font-size: 1.2rem; color: var(--blue-primary); }
+        .bot-panel-header .status { margin-left: auto; display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--blue-secondary); font-weight: 600; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        .upload-zone { border: 2px dashed var(--orange-primary); border-radius: 12px; padding: 1.5rem; text-align: center; margin-bottom: 1.5rem; transition: all 0.3s; cursor: pointer; }
+        .upload-zone:hover { border-color: var(--blue-primary); background: rgba(30,58,138,0.03); }
+        .upload-zone.dragover { background: rgba(255,107,53,0.05); border-color: var(--orange-primary); }
+        .upload-zone i { font-size: 2rem; color: var(--orange-primary); margin-bottom: 0.5rem; }
+        .upload-zone h4 { font-size: 1rem; color: var(--blue-primary); margin-bottom: 0.25rem; }
+        .upload-zone p { font-size: 0.85rem; color: var(--gray-600); margin-bottom: 0.75rem; }
+        .btn-upload-mini { background: var(--orange-gradient); color: white; padding: 0.6rem 1.2rem; border-radius: 8px; border: none; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .file-input { display: none; }
+        .file-name { margin-top: 0.75rem; color: var(--blue-secondary); font-weight: 600; font-size: 0.85rem; }
+
+        .poste-grid-mini { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.5rem; }
+        .poste-card-mini { padding: 1rem; border: 2px solid var(--gray-200); border-radius: 10px; cursor: pointer; transition: all 0.3s; text-align: center; }
+        .poste-card-mini:hover { border-color: var(--orange-primary); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255,107,53,0.1); }
+        .poste-card-mini.selected { border-color: var(--orange-primary); background: rgba(255,107,53,0.05); box-shadow: 0 4px 15px rgba(255,107,53,0.15); }
+        .poste-card-mini i { font-size: 1.2rem; color: var(--orange-primary); margin-bottom: 0.5rem; }
+        .poste-card-mini h4 { font-size: 0.9rem; color: var(--blue-primary); }
+        .poste-card-mini p { font-size: 0.75rem; color: var(--gray-600); }
+
+        .btn-analyze-mini { width: 100%; background: var(--blue-gradient); color: white; padding: 1rem; border-radius: 10px; border: none; font-weight: 700; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 20px rgba(30,58,138,0.3); transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .btn-analyze-mini:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(30,58,138,0.4); }
+        .btn-analyze-mini:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-analyze-mini.analyzing { background: var(--orange-gradient); }
+
+        .loading-mini { display: none; text-align: center; padding: 1rem; }
+        .loading-mini.show { display: block; }
+        .spinner-mini { width: 40px; height: 40px; border: 3px solid var(--gray-200); border-top-color: var(--orange-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 0.5rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* RESULTS */
+        .results-section { display: none; margin-top: 1.5rem; }
+        .results-section.show { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .score-card { background: white; border-radius: 20px; padding: 2.5rem; border: 1px solid var(--gray-200); margin-bottom: 2rem; text-align: center; transition: background 0.3s, border-color 0.3s; }
+        .score-circle { width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; flex-direction: column; color: white; font-weight: 800; }
+        .score-circle.high { background: var(--blue-gradient); box-shadow: 0 10px 30px rgba(59,130,246,0.3); }
+        .score-circle.medium { background: var(--orange-gradient); box-shadow: 0 10px 30px rgba(255,107,53,0.3); }
+        .score-circle.low { background: linear-gradient(135deg, #E55A2B, #FF6B35); box-shadow: 0 10px 30px rgba(229,90,43,0.3); }
+        .score-number { font-size: 3rem; line-height: 1; }
+        .score-label { font-size: 0.9rem; opacity: 0.9; margin-top: 0.25rem; }
+        .score-title { font-size: 1.5rem; font-weight: 700; color: var(--blue-primary); margin-bottom: 0.5rem; }
+        .score-subtitle { color: var(--gray-600); }
+
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .info-card { background: white; border-radius: 16px; padding: 1.5rem; border: 1px solid var(--gray-200); transition: all 0.3s; }
+        .info-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(30,58,138,0.08); }
+        .info-card h4 { color: var(--orange-primary); font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
+        .info-card p { color: var(--blue-primary); font-weight: 700; font-size: 1.1rem; }
+        .skills { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+        .skill-tag { background: rgba(255,107,53,0.1); color: var(--orange-primary); padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.8rem; font-weight: 500; }
+
+        .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+        .detail-card { background: white; border-radius: 16px; padding: 2rem; border: 1px solid var(--gray-200); }
+        .detail-card h3 { font-size: 1.1rem; color: var(--blue-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .detail-card ul { list-style: none; }
+        .detail-card li { padding: 0.5rem 0; color: var(--gray-600); display: flex; align-items: flex-start; gap: 0.5rem; }
+        .detail-card li i { color: var(--orange-primary); margin-top: 0.25rem; }
+        .detail-card.positive { border-left: 4px solid var(--blue-secondary); }
+        .detail-card.negative { border-left: 4px solid var(--orange-primary); }
+
+        .recommendation { background: white; border-radius: 16px; padding: 2rem; border: 1px solid var(--gray-200); text-align: center; }
+        .recommendation.high { border-color: var(--blue-secondary); background: rgba(59,130,246,0.05); }
+        .recommendation.medium { border-color: var(--orange-primary); background: rgba(255,107,53,0.05); }
+        .recommendation.low { border-color: #E55A2B; background: rgba(229,90,43,0.05); }
+        .recommendation h3 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+        .recommendation.high h3 { color: var(--blue-secondary); }
+        .recommendation.medium h3 { color: var(--orange-primary); }
+        .recommendation.low h3 { color: #E55A2B; }
+        .recommendation p { color: var(--gray-600); }
+
+        /* SECTIONS */
+        section { padding: 6rem 0; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+        .section-header { text-align: center; margin-bottom: 4rem; }
+        .section-tag { display: inline-block; background: rgba(255,107,53,0.1); color: #FF6B35; padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
+        .section-title { font-size: 2.5rem; font-weight: 800; color: #1E3A8A; margin-bottom: 1rem; }
+        .section-title span { color: #FF6B35; }
+        .section-desc { font-size: 1.1rem; color: #475569; max-width: 600px; margin: 0 auto; }
+
+        /* SERVICES */
+        .services { background: #F8FAFC; }
+        .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
+        .service-card { background: white; border-radius: 16px; padding: 2.5rem; border: 1px solid #E2E8F0; transition: all 0.4s; }
+        .service-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(30,58,138,0.1); }
+        .service-icon { width: 60px; height: 60px; background: linear-gradient(135deg, rgba(255,107,53,0.1), rgba(247,147,30,0.1)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #FF6B35; margin-bottom: 1.5rem; }
+        .service-card:hover .service-icon { background: linear-gradient(135deg, #FF6B35, #F7931E); color: white; }
+        .service-card h3 { font-size: 1.3rem; font-weight: 700; color: #1E3A8A; margin-bottom: 0.75rem; }
+        .service-card p { color: #475569; font-size: 0.95rem; margin-bottom: 1.5rem; }
+        .service-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .service-tag { background: #F1F5F9; color: #3B82F6; padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.8rem; font-weight: 500; }
+
+        /* EXPERTISE */
+        .expertise { background: #1E3A8A; color: white; }
+        .expertise .section-title { color: white; }
+        .expertise .section-title span { color: #F7931E; }
+        .expertise-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; }
+        .expertise-item { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 1.5rem; text-align: center; transition: all 0.3s; }
+        .expertise-item:hover { background: rgba(255,255,255,0.15); border-color: #FF6B35; }
+        .expertise-item i { font-size: 2rem; color: #F7931E; margin-bottom: 0.75rem; display: block; }
+
+        /* NUMBERS */
+        .numbers { background: linear-gradient(135deg, #1E3A8A 0%, #1e40af 100%); color: white; padding: 5rem 0; }
+        .numbers-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 3rem; text-align: center; }
+        .number-item h3 { font-size: 3rem; font-weight: 800; color: #F7931E; }
+
+        /* TESTIMONIALS */
+        .testimonials { background: #F8FAFC; }
+        .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; }
+        .testimonial-card { background: white; border-radius: 16px; padding: 2.5rem; border: 1px solid #E2E8F0; position: relative; }
+        .testimonial-stars { color: #F7931E; margin-bottom: 1rem; }
+        .testimonial-text { color: #475569; font-style: italic; margin-bottom: 1.5rem; }
+        .testimonial-author { display: flex; align-items: center; gap: 1rem; }
+        .testimonial-avatar { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #1E3A8A, #3B82F6); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
+
+        /* CONTACT */
+        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; }
+        .contact-info h3 { font-size: 1.8rem; font-weight: 800; color: #1E3A8A; margin-bottom: 1rem; }
+        .contact-details { display: flex; flex-direction: column; gap: 1.5rem; }
+        .contact-item { display: flex; align-items: flex-start; gap: 1rem; }
+        .contact-item-icon { width: 50px; height: 50px; background: linear-gradient(135deg, #FF6B35, #F7931E); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; min-width: 50px; }
+        .contact-form { background: #F8FAFC; border-radius: 20px; padding: 2.5rem; border: 1px solid #E2E8F0; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; font-weight: 600; color: #1E3A8A; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.9rem 1rem; border: 2px solid #E2E8F0; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.95rem; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: #FF6B35; }
+        .form-group textarea { min-height: 120px; resize: vertical; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .btn-submit { width: 100%; background: linear-gradient(135deg, #FF6B35, #F7931E); color: white; padding: 1rem; border: none; border-radius: 10px; font-weight: 700; font-size: 1rem; cursor: pointer; }
+
+        /* CONTACT MAP */
+        .contact-map-container { border-radius: 20px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.1); min-height: 400px; position: relative; }
+        #contactMap { width: 100%; height: 400px; border-radius: 20px; z-index: 1; }
+        .calendly-btn { display: inline-flex; align-items: center; gap: 0.75rem; background: linear-gradient(135deg, #FF6B35, #F7931E); color: white; padding: 1rem 2rem; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 1rem; box-shadow: 0 4px 20px rgba(255,107,53,0.3); transition: all 0.3s; border: none; cursor: pointer; margin-top: 1.5rem; }
+        .calendly-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(255,107,53,0.4); }
+
+        /* CALENDLY MODAL */
+        .calendly-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: center; }
+        .calendly-modal.show { display: flex; }
+        .calendly-modal-content { background: white; border-radius: 20px; width: 90%; max-width: 900px; height: 85%; position: relative; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .calendly-modal-close { position: absolute; top: 1rem; right: 1rem; background: var(--orange-primary); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; z-index: 10; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+        .calendly-modal-close:hover { background: var(--orange-dark); transform: rotate(90deg); }
+        .calendly-modal iframe { width: 100%; height: 100%; border: none; border-radius: 20px; }
+
+        /* FOOTER */
+        footer { background: #0F172A; color: white; padding: 4rem 0 2rem; }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
+        .footer-social { display: flex; gap: 1rem; margin-top: 1.5rem; }
+        .footer-social a { width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; }
+        .footer-social a:hover { background: #FF6B35; }
+        .footer-column h4 { font-size: 1rem; font-weight: 700; margin-bottom: 1.5rem; color: #F7931E; }
+        .footer-column ul { list-style: none; }
+        .footer-column li { margin-bottom: 0.75rem; }
+        .footer-column a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.9rem; }
+        .footer-column a:hover { color: #F7931E; }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem; display: flex; justify-content: space-between; color: rgba(255,255,255,0.5); font-size: 0.85rem; }
+        .footer-logo { text-align: center; margin-bottom: 2rem; }
+        .footer-logo img { height: 80px; width: auto; opacity: 0.9; }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .hero-container, .contact-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .details-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            nav { display: none; }
+            .btn-contact { display: none; }
+            .dark-mode-toggle { display: none; }
+            .hero-content h1 { font-size: 2.5rem; }
+            .section-title { font-size: 2rem; }
+            .testimonials-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; }
+            .numbers-grid { grid-template-columns: 1fr 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .poste-grid-mini { grid-template-columns: 1fr; }
+            .info-grid { grid-template-columns: 1fr; }
+            .contact-map-container { min-height: 300px; }
+            #contactMap { height: 300px; }
+            .calendly-modal-content { width: 95%; height: 90%; }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header>
+        <div class="header-container">
+            <a href="#" class="logo">
+                <img src="logo_ridcha_data.png" alt="RIDCHA DATA">
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="#accueil">Accueil</a></li>
+                    <li><a href="#bot-rh">Bot RH</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#expertise">Expertise</a></li>
+                    <li><a href="#temoignages">Temoignages</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+            <div style="display: flex; align-items: center;">
+                <a href="#contact" class="btn-contact">Nous contacter</a>
+                <button class="dark-mode-toggle" id="darkModeToggle" title="Mode sombre">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero" id="accueil">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>Transformez vos <span>donnees</span> en decisions</h1>
+                <p>RIDCHA DATA, ESN specialisee en Data Science, Data Engineering et Business Intelligence. Nous accompagnons les entreprises dans leur transformation data avec expertise et innovation.</p>
+                <div class="hero-buttons">
+                    <a href="#bot-rh" class="btn-primary">Essayer le Bot RH</a>
+                    <a href="#services" class="btn-secondary">Nos services</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item"><h3>50+</h3><p>Projets livres</p></div>
+                    <div class="stat-item"><h3>30+</h3><p>Experts Data</p></div>
+                    <div class="stat-item"><h3>98%</h3><p>Satisfaction</p></div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 2rem; color: #a5b4fc; font-family: monospace; font-size: 0.85rem; line-height: 1.8;">
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                        <div style="width: 12px; height: 12px; border-radius: 50%; background: #FF6B35;"></div>
+                        <span style="color: white; font-weight: 600;">RIDCHA DATA - Pipeline ML</span>
+                    </div>
+                    <span style="color: #64748b;"># Transformation data en production</span><br>
+                    <span style="color: #F7931E;">import</span> pandas <span style="color: #F7931E;">as</span> pd<br>
+                    <span style="color: #F7931E;">from</span> sklearn.ensemble <span style="color: #F7931E;">import</span> XGBoost<br><br>
+                    data = pd.read_csv(<span style="color: #86efac;">'client_data.csv'</span>)<br>
+                    model = XGBoost.train(data)<br>
+                    predictions = model.predict(features)<br>
+                    <span style="color: #F7931E;">print</span>(<span style="color: #86efac;">"Accuracy: 94.7%"</span>)
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== BOT RH ===== -->
+    <section class="bot-hero" id="bot-rh">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1><i class="fas fa-robot"></i> Bot RH <span>Intelligent</span></h1>
+                <p>Bienvenue chez RIDCHA DATA ! Notre assistant intelligent analyse automatiquement les CV de vos candidats et vous fournit un score pertinent pour chaque poste.</p>
+                <div style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem;">
+                    <i class="fas fa-magic" style="font-size: 2rem; color: #F7931E; margin-bottom: 0.75rem; display: block;"></i>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">Comment ca marche ?</h3>
+                    <p style="font-size: 0.95rem; color: rgba(255,255,255,0.7); margin-bottom: 0;">1. Deposez un CV au format PDF<br>2. Selectionnez le poste recherche<br>3. Obtenez une analyse detaillee en quelques secondes</p>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item"><h3>50+</h3><p>CV analyses</p></div>
+                    <div class="stat-item"><h3>4</h3><p>Postes disponibles</p></div>
+                    <div class="stat-item"><h3>98%</h3><p>Precision</p></div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="bot-panel">
+                    <div class="bot-panel-header">
+                        <i class="fas fa-robot"></i>
+                        <h3>Assistant RH</h3>
+                        <div class="status"><div class="status-dot"></div>En ligne</div>
+                    </div>
+
+                    <div class="upload-zone" id="dropZone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h4>Deposez votre CV PDF</h4>
+                        <p>Glissez un fichier ou cliquez pour parcourir</p>
+                        <input type="file" id="fileInput" class="file-input" accept=".pdf">
+                        <button class="btn-upload-mini" id="btnUpload">
+                            <i class="fas fa-folder-open"></i> Choisir un fichier
+                        </button>
+                        <div class="file-name" id="fileName"></div>
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <h4 style="font-size: 0.95rem; color: var(--blue-primary); margin-bottom: 0.75rem;"><i class="fas fa-briefcase"></i> Selectionnez le poste</h4>
+                        <div class="poste-grid-mini">
+                            <div class="poste-card-mini" data-poste="data_scientist">
+                                <i class="fas fa-brain"></i>
+                                <h4>Data Scientist</h4>
+                                <p>ML, Deep Learning</p>
+                            </div>
+                            <div class="poste-card-mini" data-poste="data_engineer">
+                                <i class="fas fa-database"></i>
+                                <h4>Data Engineer</h4>
+                                <p>Spark, Cloud</p>
+                            </div>
+                            <div class="poste-card-mini" data-poste="data_analyst">
+                                <i class="fas fa-chart-pie"></i>
+                                <h4>Data Analyst</h4>
+                                <p>SQL, BI</p>
+                            </div>
+                            <div class="poste-card-mini" data-poste="devops">
+                                <i class="fas fa-cloud"></i>
+                                <h4>DevOps Data</h4>
+                                <p>Kubernetes, CI/CD</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn-analyze-mini" id="btnAnalyze" disabled>
+                        <i class="fas fa-search"></i> Analyser le CV
+                    </button>
+
+                    <div class="loading-mini" id="loading">
+                        <div class="spinner-mini"></div>
+                        <p style="font-size: 0.85rem; color: var(--blue-primary); font-weight: 600;">Analyse en cours...</p>
+                    </div>
+
+                    <div class="results-section" id="results">
+                        <div class="score-card">
+                            <div class="score-circle" id="scoreCircle">
+                                <div class="score-number" id="scoreNumber">0</div>
+                                <div class="score-label">/ 100</div>
+                            </div>
+                            <div class="score-title" id="scoreTitle">En attente</div>
+                            <div class="score-subtitle" id="scoreSubtitle">Selectionnez un CV et un poste</div>
+                        </div>
+
+                        <div class="info-grid" id="infoGrid"></div>
+
+                        <div class="details-grid">
+                            <div class="detail-card positive">
+                                <h3><i class="fas fa-check-circle"></i> Points forts</h3>
+                                <ul id="pointsForts"></ul>
+                            </div>
+                            <div class="detail-card negative">
+                                <h3><i class="fas fa-exclamation-triangle"></i> Competences manquantes</h3>
+                                <ul id="pointsFaibles"></ul>
+                            </div>
+                        </div>
+
+                        <div class="recommendation" id="recommendation">
+                            <h3><i class="fas fa-lightbulb"></i> Recommandation</h3>
+                            <p id="recommendationText">Analyse en cours...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SERVICES ===== -->
+    <section class="services" id="services">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Nos services</div>
+                <h2 class="section-title">Des solutions <span>Data</span> sur mesure</h2>
+                <p class="section-desc">De la strategie a la mise en production, nous couvrons l'ensemble du cycle de vie de vos projets data.</p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon"><i class="fas fa-brain"></i></div>
+                    <h3>Data Science & ML</h3>
+                    <p>Modelisation predictive, deep learning, NLP et computer vision pour transformer vos donnees en insights actionnables.</p>
+                    <div class="service-tags">
+                        <span class="service-tag">Python</span><span class="service-tag">TensorFlow</span><span class="service-tag">PyTorch</span><span class="service-tag">XGBoost</span>
+                    </div>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon"><i class="fas fa-database"></i></div>
+                    <h3>Data Engineering</h3>
+                    <p>Architecture data, pipelines ETL/ELT, data lakes et warehouses pour une infrastructure robuste et scalable.</p>
+                    <div class="service-tags">
+                        <span class="service-tag">Spark</span><span class="service-tag">Kafka</span><span class="service-tag">Airflow</span><span class="service-tag">dbt</span>
+                    </div>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon"><i class="fas fa-chart-pie"></i></div>
+                    <h3>Business Intelligence</h3>
+                    <p>Tableaux de bord interactifs, reporting automatise et data visualisation pour une prise de decision eclairee.</p>
+                    <div class="service-tags">
+                        <span class="service-tag">Tableau</span><span class="service-tag">Power BI</span><span class="service-tag">Looker</span><span class="service-tag">SQL</span>
+                    </div>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon"><i class="fas fa-cloud"></i></div>
+                    <h3>Cloud & DevOps Data</h3>
+                    <p>Migration cloud, MLOps et CI/CD pour deployer vos modeles en production avec fiabilite et performance.</p>
+                    <div class="service-tags">
+                        <span class="service-tag">AWS</span><span class="service-tag">GCP</span><span class="service-tag">Azure</span><span class="service-tag">Kubernetes</span>
+                    </div>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon"><i class="fas fa-lightbulb"></i></div>
+                    <h3>Conseil & Strategie</h3>
+                    <p>Audit data maturity, roadmap transformation digitale et gouvernance RGPD pour une vision a long terme.</p>
+                    <div class="service-tags">
+                        <span class="service-tag">CRISP-DM</span><span class="service-tag">Agile</span><span class="service-tag">RGPD</span><span class="service-tag">Data Gov</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== EXPERTISE ===== -->
+    <section class="expertise" id="expertise">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Notre expertise</div>
+                <h2 class="section-title">Technologies <span>maitrisees</span></h2>
+                <p class="section-desc">Une stack technique moderne et eprouvee pour repondre a tous vos besoins data.</p>
+            </div>
+            <div class="expertise-grid">
+                <div class="expertise-item"><i class="fab fa-python"></i><h4>Python</h4><p>Pandas, NumPy, Scikit-learn</p></div>
+                <div class="expertise-item"><i class="fas fa-brain"></i><h4>Deep Learning</h4><p>TensorFlow, PyTorch, Keras</p></div>
+                <div class="expertise-item"><i class="fas fa-database"></i><h4>Big Data</h4><p>Spark, Hadoop, Kafka</p></div>
+                <div class="expertise-item"><i class="fas fa-cloud"></i><h4>Cloud</h4><p>AWS, GCP, Azure</p></div>
+                <div class="expertise-item"><i class="fas fa-chart-bar"></i><h4>BI</h4><p>Tableau, Power BI, Looker</p></div>
+                <div class="expertise-item"><i class="fab fa-docker"></i><h4>DevOps</h4><p>Docker, Kubernetes, CI/CD</p></div>
+                <div class="expertise-item"><i class="fas fa-robot"></i><h4>NLP</h4><p>Spacy, NLTK, Transformers</p></div>
+                <div class="expertise-item"><i class="fas fa-eye"></i><h4>Computer Vision</h4><p>OpenCV, YOLO, CNN</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== NUMBERS ===== -->
+    <section class="numbers">
+        <div class="container">
+            <div class="numbers-grid">
+                <div class="number-item"><h3>50+</h3><p>Projets data livres</p></div>
+                <div class="number-item"><h3>30+</h3><p>Consultants experts</p></div>
+                <div class="number-item"><h3>25+</h3><p>Clients references</p></div>
+                <div class="number-item"><h3>98%</h3><p>Taux de satisfaction</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== TESTIMONIALS ===== -->
+    <section class="testimonials" id="temoignages">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Temoignages</div>
+                <h2 class="section-title">Ils nous font <span>confiance</span></h2>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p class="testimonial-text">RIDCHA DATA a transforme notre approche data. Leur equipe a deploye un pipeline ML en production en 3 mois, avec un ROI mesurable des la premiere annee.</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">MD</div>
+                        <div><h4>Marie Dupont</h4><p>Directrice Digital, RetailGroup</p></div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p class="testimonial-text">Professionnalisme, expertise technique et reactivite. L'equipe RIDCHA a modernise notre data warehouse cloud avec zero downtime. Impressionnant.</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">TL</div>
+                        <div><h4>Thomas Lefebvre</h4><p>CTO, ABC Industries</p></div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
+                    <p class="testimonial-text">Un vrai partenaire strategique. Leur approche CRISP-DM et leur transfert de competences ont permis a notre equipe d'etre autonome en 6 mois.</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">SB</div>
+                        <div><h4>Sarah Benali</h4><p>Head of Data, DEF Finance</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CONTACT ===== -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Contact</div>
+                <h2 class="section-title">Discutons de votre <span>projet</span></h2>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h3>Parlons de vos besoins data</h3>
+                    <p>Que vous ayez un projet concret ou une idee a explorer, notre equipe est la pour vous accompagner.</p>
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <div class="contact-item-icon"><i class="fas fa-map-marker-alt"></i></div>
+                            <div><h4>Siege social</h4><p>Montigny-le-Bretonneux, Yvelines (78)</p></div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-item-icon"><i class="fas fa-phone"></i></div>
+                            <div><h4>Telephone</h4><p>06 32 98 87 23</p></div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-item-icon"><i class="fas fa-envelope"></i></div>
+                            <div><h4>Email</h4><p>mohamedchammam021@gmail.com</p></div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-item-icon"><i class="fab fa-linkedin"></i></div>
+                            <div><h4>LinkedIn</h4><p>linkedin.com/company/ridcha-data</p></div>
+                        </div>
+                    </div>
+                    <button class="calendly-btn" id="calendlyBtn">
+                        <i class="fas fa-calendar-alt"></i> Reserver un appel de 30 min
+                    </button>
+                </div>
+                <div class="contact-map-container">
+                    <div id="contactMap"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <div class="container">
+            <div class="footer-logo">
+                <img src="logo_ridcha_data.png" alt="RIDCHA DATA">
+            </div>
+            <div class="footer-grid">
+                <div>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: white;">RIDCHA <span style="color: #FF6B35;">DATA</span></div>
+                    <p style="color: rgba(255,255,255,0.7); margin-top: 1rem;">ESN specialisee en Data Science, Data Engineering et Business Intelligence. Nous transformons vos donnees en levier de performance.</p>
+                    <div class="footer-social">
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h4>Services</h4>
+                    <ul><li><a href="#">Data Science</a></li><li><a href="#">Data Engineering</a></li><li><a href="#">BI</a></li><li><a href="#">Cloud</a></li></ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Entreprise</h4>
+                    <ul><li><a href="#">A propos</a></li><li><a href="#">Equipe</a></li><li><a href="#">Carrieres</a></li></ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Contact</h4>
+                    <ul><li><a href="#">Devis</a></li><li><a href="#">Recrutement</a></li><li><a href="#">Support</a></li></ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>2024 RIDCHA DATA. Tous droits reserves.</p>
+                <p>SAS - SIREN 892 456 123 - Montigny-le-Bretonneux</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== CALENDLY MODAL ===== -->
+    <div class="calendly-modal" id="calendlyModal">
+        <div class="calendly-modal-content">
+            <button class="calendly-modal-close" id="calendlyClose">
+                <i class="fas fa-times"></i>
+            </button>
+            <iframe src="https://calendly.com/ridcha-data/30min" allow="camera; microphone; autoplay; encrypted-media; fullscreen"></iframe>
+        </div>
+    </div>
+
+    <script>
+
+        // ===== DARK MODE =====
+        (function() {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+
+            function toggleDarkMode() {
+                document.body.classList.toggle('dark-mode');
+                const icon = darkModeToggle.querySelector('i');
+                if (document.body.classList.contains('dark-mode')) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                    localStorage.setItem('darkMode', 'enabled');
+                } else {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                    localStorage.setItem('darkMode', 'disabled');
+                }
+            }
+
+            if (darkModeToggle) {
+                darkModeToggle.addEventListener('click', toggleDarkMode);
+            }
+
+            // Check saved preference
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                document.body.classList.add('dark-mode');
+                const icon = darkModeToggle ? darkModeToggle.querySelector('i') : null;
+                if (icon) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                }
+            }
+        })();
+
+        // ===== CALENDLY MODAL =====
+        (function() {
+            const calendlyBtn = document.getElementById('calendlyBtn');
+            const calendlyModal = document.getElementById('calendlyModal');
+            const calendlyClose = document.getElementById('calendlyClose');
+
+            function openCalendly() {
+                if (calendlyModal) {
+                    calendlyModal.classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+
+            function closeCalendly() {
+                if (calendlyModal) {
+                    calendlyModal.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+            }
+
+            if (calendlyBtn) {
+                calendlyBtn.addEventListener('click', openCalendly);
+            }
+
+            if (calendlyClose) {
+                calendlyClose.addEventListener('click', closeCalendly);
+            }
+
+            if (calendlyModal) {
+                calendlyModal.addEventListener('click', function(e) {
+                    if (e.target === this) closeCalendly();
+                });
+            }
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closeCalendly();
+            });
+        })();
+
+        // ===== LEAFLET MAP =====
+        (function() {
+            function initMap() {
+                const mapContainer = document.getElementById('contactMap');
+                if (!mapContainer) return;
+
+                const lat = 48.7833;
+                const lng = 2.0333;
+
+                const map = L.map('contactMap').setView([lat, lng], 13);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                    maxZoom: 19
+                }).addTo(map);
+
+                const customIcon = L.divIcon({
+                    className: 'custom-marker',
+                    html: '<div style="background: linear-gradient(135deg, #FF6B35, #F7931E); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.2rem; box-shadow: 0 4px 15px rgba(255,107,53,0.4); border: 3px solid white;"><i class="fas fa-map-marker-alt" style="font-size: 1rem;"></i></div>',
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 40]
+                });
+
+                L.marker([lat, lng], { icon: customIcon }).addTo(map)
+                    .bindPopup('<div style="text-align: center; font-family: Inter, sans-serif;"><h3 style="color: #1E3A8A; margin: 0 0 5px 0;">RIDCHA DATA</h3><p style="color: #475569; margin: 0;">Montigny-le-Bretonneux<br>Yvelines (78)</p></div>')
+                    .openPopup();
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initMap);
+            } else {
+                initMap();
+            }
+        })();
+
+        // ===== BOT RH =====
+        (function() {
+            // Configuration PDF.js
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+            let selectedFile = null;
+            let selectedPoste = null;
+            let cvText = '';
+
+            const POSTES = {
+                data_scientist: {
+                    competences: ['python', 'machine learning', 'deep learning', 'tensorflow', 'pytorch', 'scikit-learn', 'pandas', 'numpy', 'statistiques', 'modelisation', 'algorithmes', 'r', 'data mining', 'nlp', 'keras', 'xgboost', 'matplotlib', 'seaborn', 'regression', 'classification', 'clustering'],
+                    experience_min: 2,
+                    formation: ['master', 'doctorat', 'phd', 'ingenieur', 'data science', 'mathematiques', 'statistiques']
+                },
+                data_engineer: {
+                    competences: ['python', 'sql', 'spark', 'hadoop', 'kafka', 'aws', 'gcp', 'azure', 'etl', 'pipeline', 'docker', 'kubernetes', 'big data', 'mongodb', 'postgresql', 'airflow', 'dbt', 'terraform', 'ci/cd', 'git', 'data warehouse', 'streaming'],
+                    experience_min: 2,
+                    formation: ['master', 'ingenieur', 'informatique', 'data engineering']
+                },
+                data_analyst: {
+                    competences: ['sql', 'python', 'r', 'tableau', 'power bi', 'excel', 'visualisation', 'dashboard', 'reporting', 'analyse', 'statistics', 'google analytics', 'qlik', 'looker', 'kpi', 'indicateurs', 'business intelligence'],
+                    experience_min: 1,
+                    formation: ['licence', 'master', 'ecole de commerce', 'informatique', 'economie', 'gestion']
+                },
+                devops: {
+                    competences: ['docker', 'kubernetes', 'aws', 'gcp', 'azure', 'ci/cd', 'jenkins', 'git', 'terraform', 'ansible', 'python', 'bash', 'linux', 'monitoring', 'prometheus', 'grafana', 'helm', 'argo'],
+                    experience_min: 2,
+                    formation: ['master', 'ingenieur', 'informatique', 'reseaux']
+                }
+            };
+
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const fileNameDisplay = document.getElementById('fileName');
+            const btnAnalyze = document.getElementById('btnAnalyze');
+            const btnUpload = document.getElementById('btnUpload');
+
+            // Prevent default drag behaviors
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                document.body.addEventListener(eventName, function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, false);
+            });
+
+            // Drop zone events
+            if (dropZone) {
+                dropZone.addEventListener('dragenter', function() {
+                    this.classList.add('dragover');
+                });
+
+                dropZone.addEventListener('dragover', function() {
+                    this.classList.add('dragover');
+                });
+
+                dropZone.addEventListener('dragleave', function() {
+                    this.classList.remove('dragover');
+                });
+
+                dropZone.addEventListener('drop', function(e) {
+                    this.classList.remove('dragover');
+                    const files = e.dataTransfer.files;
+                    if (files && files.length > 0) {
+                        handleFile(files[0]);
+                    }
+                });
+
+                // Click on drop zone (but not on button)
+                dropZone.addEventListener('click', function(e) {
+                    if (e.target !== btnUpload && !btnUpload.contains(e.target)) {
+                        fileInput.click();
+                    }
+                });
+            }
+
+            // File input change
+            if (fileInput) {
+                fileInput.addEventListener('change', function(e) {
+                    if (e.target.files && e.target.files.length > 0) {
+                        handleFile(e.target.files[0]);
+                    }
+                });
+            }
+
+            // Upload button click
+            if (btnUpload) {
+                btnUpload.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    fileInput.click();
+                });
+            }
+
+            function handleFile(file) {
+                console.log('File received:', file.name, 'Type:', file.type);
+
+                if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+                    alert('Veuillez selectionner un fichier PDF');
+                    return;
+                }
+
+                selectedFile = file;
+                if (fileNameDisplay) {
+                    fileNameDisplay.textContent = '✓ ' + file.name;
+                    fileNameDisplay.style.color = 'var(--blue-secondary)';
+                }
+
+                console.log('File stored successfully');
+                checkReady();
+            }
+
+            // Poste selection
+            document.querySelectorAll('.poste-card-mini').forEach(card => {
+                card.addEventListener('click', function() {
+                    console.log('Poste selected:', this.dataset.poste);
+
+                    document.querySelectorAll('.poste-card-mini').forEach(c => {
+                        c.classList.remove('selected');
+                    });
+
+                    this.classList.add('selected');
+                    selectedPoste = this.dataset.poste;
+
+                    checkReady();
+                });
+            });
+
+            function checkReady() {
+                console.log('Checking ready - File:', selectedFile ? 'YES' : 'NO', 'Poste:', selectedPoste ? 'YES' : 'NO');
+
+                if (btnAnalyze) {
+                    if (selectedFile && selectedPoste) {
+                        btnAnalyze.disabled = false;
+                        btnAnalyze.style.opacity = '1';
+                        btnAnalyze.style.cursor = 'pointer';
+                        console.log('Button ENABLED');
+                    } else {
+                        btnAnalyze.disabled = true;
+                        btnAnalyze.style.opacity = '0.6';
+                        btnAnalyze.style.cursor = 'not-allowed';
+                        console.log('Button DISABLED');
+                    }
+                }
+            }
+
+            // Analyze button
+            if (btnAnalyze) {
+                btnAnalyze.addEventListener('click', async function() {
+                    console.log('Analyze clicked!');
+
+                    if (!selectedFile || !selectedPoste) {
+                        alert('Veuillez selectionner un fichier PDF et un poste');
+                        return;
+                    }
+
+                    const loading = document.getElementById('loading');
+                    const results = document.getElementById('results');
+
+                    btnAnalyze.disabled = true;
+                    btnAnalyze.classList.add('analyzing');
+                    btnAnalyze.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyse en cours...';
+                    if (loading) loading.classList.add('show');
+                    if (results) results.classList.remove('show');
+
+                    try {
+                        console.log('Starting PDF extraction...');
+
+                        const arrayBuffer = await selectedFile.arrayBuffer();
+                        console.log('ArrayBuffer loaded, size:', arrayBuffer.byteLength);
+
+                        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                        console.log('PDF loaded, pages:', pdf.numPages);
+
+                        let text = '';
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const content = await page.getTextContent();
+                            text += content.items.map(item => item.str).join(' ') + ' ';
+                        }
+
+                        cvText = text.toLowerCase();
+                        console.log('Text extracted, length:', cvText.length);
+
+                        const result = calculateScore(cvText, selectedPoste);
+                        console.log('Score calculated:', result.score);
+
+                        displayResults(result);
+                        console.log('Results displayed!');
+
+                    } catch (error) {
+                        console.error('ERROR:', error);
+                        alert('Erreur lors de la lecture du PDF: ' + error.message);
+                    } finally {
+                        if (loading) loading.classList.remove('show');
+                        btnAnalyze.classList.remove('analyzing');
+                        btnAnalyze.innerHTML = '<i class="fas fa-search"></i> Analyser le CV';
+                        checkReady();
+                    }
+                });
+            }
+
+            function calculateScore(text, posteKey) {
+                const config = POSTES[posteKey];
+                let score = 0;
+                const pointsForts = [];
+                const manques = [];
+
+                const foundComp = config.competences.filter(c => text.includes(c));
+                const ratioComp = foundComp.length / config.competences.length;
+                score += ratioComp * 40;
+                pointsForts.push('✓ ' + foundComp.length + '/' + config.competences.length + ' competences cles identifiees');
+                const missingComp = config.competences.filter(c => !text.includes(c)).slice(0, 5);
+                if (missingComp.length) manques.push('Competences manquantes: ' + missingComp.join(', '));
+
+                const expMatch = text.match(/(\d+)\s*ans?\s*d['']?exp[eé]rience/);
+                const exp = expMatch ? parseInt(expMatch[1]) : 0;
+                if (exp >= config.experience_min + 3) { score += 25; pointsForts.push('✓ Experience solide (' + exp + ' ans)'); }
+                else if (exp >= config.experience_min) { score += 15; pointsForts.push('~ Experience correcte (' + exp + ' ans)'); }
+                else { score += Math.max(0, (exp / config.experience_min) * 15); manques.push('Experience insuffisante (' + exp + ' vs ' + config.experience_min + ' min)'); }
+
+                const foundForm = config.formation.filter(f => text.includes(f));
+                if (foundForm.length) { score += 15; pointsForts.push('✓ Formation adequate'); }
+                else { score += 5; manques.push('Formation non alignee avec le poste'); }
+
+                if (foundComp.length >= 15) { score += 10; pointsForts.push('✓ Stack technique riche (' + foundComp.length + ' competences)'); }
+                else if (foundComp.length >= 8) { score += 5; pointsForts.push('~ Stack technique moyen (' + foundComp.length + ')'); }
+                else { manques.push('Stack technique limite (' + foundComp.length + ')'); }
+
+                if (text.includes('anglais')) { score += 10; pointsForts.push('✓ Anglais maitrise'); }
+                else { manques.push('Anglais non detecte'); }
+
+                score = Math.min(100, Math.round(score));
+
+                let niveau, recClass, recText;
+                if (score >= 85) { niveau = 'EXCELLENT - Recrutement prioritaire'; recClass = 'high'; recText = 'RECRUTEMENT PRIORITAIRE - Contactez immediatement ce candidat'; }
+                else if (score >= 70) { niveau = 'Tres bon - Profil interessant'; recClass = 'high'; recText = 'PROFIL INTERESSANT - Programmer un entretien technique'; }
+                else if (score >= 55) { niveau = 'Bon - A approfondir'; recClass = 'medium'; recText = 'A APPROFONDIR - Verifier les competences manquantes en entretien'; }
+                else if (score >= 40) { niveau = 'Moyen - Profil partiel'; recClass = 'medium'; recText = 'PROFIL MOYEN - Garder en reserve pour futurs besoins'; }
+                else { niveau = 'Insuffisant - Non recommande'; recClass = 'low'; recText = 'NON RECOMMANDE - Competences trop eloignees du poste'; }
+
+                return { score: score, niveau: niveau, recClass: recClass, recText: recText, pointsForts: pointsForts, manques: manques, foundComp: foundComp, exp: exp };
+            }
+
+            function displayResults(r) {
+                const results = document.getElementById('results');
+                const circle = document.getElementById('scoreCircle');
+                const num = document.getElementById('scoreNumber');
+                const title = document.getElementById('scoreTitle');
+                const sub = document.getElementById('scoreSubtitle');
+
+                if (circle) circle.className = 'score-circle ' + (r.score >= 70 ? 'high' : r.score >= 55 ? 'medium' : 'low');
+                if (num) num.textContent = r.score;
+                if (title) title.textContent = r.niveau;
+                if (sub) sub.textContent = 'Score calcule sur ' + r.foundComp.length + ' competences identifiees';
+
+                const infoGrid = document.getElementById('infoGrid');
+                if (infoGrid) {
+                    infoGrid.innerHTML = 
+                        '<div class="info-card">' +
+                            '<h4>Competences detectees</h4>' +
+                            '<p>' + r.foundComp.length + ' / ' + POSTES[selectedPoste].competences.length + '</p>' +
+                            '<div class="skills">' + r.foundComp.slice(0, 8).map(c => '<span class="skill-tag">' + c + '</span>').join('') + '</div>' +
+                        '</div>' +
+                        '<div class="info-card">' +
+                            '<h4>Experience</h4>' +
+                            '<p>' + (r.exp > 0 ? r.exp + ' ans' : 'Non detectee') + '</p>' +
+                        '</div>' +
+                        '<div class="info-card">' +
+                            '<h4>Poste vise</h4>' +
+                            '<p>' + selectedPoste.replace('_', ' ').toUpperCase() + '</p>' +
+                        '</div>';
+                }
+
+                const pfList = document.getElementById('pointsForts');
+                if (pfList) pfList.innerHTML = r.pointsForts.map(p => '<li><i class="fas fa-check-circle"></i> ' + p + '</li>').join('');
+
+                const pmList = document.getElementById('pointsFaibles');
+                if (pmList) pmList.innerHTML = r.manques.length ? r.manques.map(m => '<li><i class="fas fa-times-circle"></i> ' + m + '</li>').join('') : '<li><i class="fas fa-check-circle"></i> Aucun manque majeur detecte</li>';
+
+                const rec = document.getElementById('recommendation');
+                if (rec) rec.className = 'recommendation ' + r.recClass;
+                const recText = document.getElementById('recommendationText');
+                if (recText) recText.textContent = r.recText;
+
+                if (results) {
+                    results.classList.add('show');
+                    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+
+            // Initialize
+            checkReady();
+            console.log('Bot RH initialized successfully!');
+        })();
+    </script>
+</body>
+</html>
